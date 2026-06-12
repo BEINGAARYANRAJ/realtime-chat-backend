@@ -25,7 +25,7 @@ const start = async () => {
   await createTables();
   await connectRedis();
   initSocket(server);
-  server.listen(process.env.PORT, () => {
+  server.listen(process.env.PORT || 10000, '0.0.0.0', () => {
     console.log(`Server running on port ${process.env.PORT} ✅`);
     console.log(`Socket.io initialized ✅`);
   });
