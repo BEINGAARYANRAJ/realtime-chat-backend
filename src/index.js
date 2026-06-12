@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const http = require('http');
 require('dotenv').config();
 
@@ -12,10 +11,19 @@ const messageRoutes = require('./routes/messages');
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors({ origin: '*', credentials: false }));
+// CORS - handle everything manually
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', messageRoutes);
 
@@ -26,7 +34,7 @@ const start = async () => {
   await connectRedis();
   initSocket(server);
   server.listen(process.env.PORT || 10000, '0.0.0.0', () => {
-    console.log(`Server running on port ${process.env.PORT} ✅`);
+    console.log(`Server running on port ${process.env.PORT || 10000} ✅`);
     console.log(`Socket.io initialized ✅`);
   });
 };
